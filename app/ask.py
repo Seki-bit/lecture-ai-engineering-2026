@@ -11,6 +11,7 @@
 """
 
 import argparse
+import time
 
 from google import genai
 from google.genai import errors
@@ -22,8 +23,11 @@ DEFAULT_QUESTION = "AIE2026の講座の宿題にある「3レベル」とは何�
 
 
 def ask(chat: genai.chats.Chat, question: str) -> str:
+    started_at = time.perf_counter()
     response = chat.send_message(question)
+    elapsed_seconds = time.perf_counter() - started_at
     usage = response.usage_metadata#使用トークン数の取得
+    print(f"[応答時間] {elapsed_seconds:.3f} 秒")
     print(f"[トークン数] 入力: {usage.prompt_token_count}, 出力: {usage.candidates_token_count}")
 
     return response.text

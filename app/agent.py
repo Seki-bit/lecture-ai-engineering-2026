@@ -14,6 +14,7 @@
 import argparse
 import inspect
 import json
+import time
 from pathlib import Path
 
 from pydantic_ai import Agent
@@ -128,10 +129,13 @@ def main() -> None:
     if args.mcp:
         print("[tools] MCP サーバー（app/mcp_servers.json）")
     try:
+        started_at = time.perf_counter()
         result = target.run_sync(args.question, model=build_model())
+        elapsed_seconds = time.perf_counter() - started_at
     except ModelHTTPError as e:
         print(api_error_message(e.status_code, str(e.body)[:200]))
         raise SystemExit(1)
+    print(f"[応答時間] {elapsed_seconds:.3f} 秒")
     print(result.output)
     if args.trace:
         print_trace(result)
