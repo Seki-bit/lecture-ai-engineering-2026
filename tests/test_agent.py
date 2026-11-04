@@ -7,6 +7,7 @@ TestModel は実際のLLMを呼ばない偽モデルで、登録されたツー�
 
 from pydantic_ai import DeferredToolRequests
 from pydantic_ai.messages import ToolCallPart, ToolReturnPart
+from pydantic_ai import DeferredToolRequests
 from pydantic_ai.models.test import TestModel
 
 from app.agent import agent
@@ -19,7 +20,7 @@ def _parts(result, kind):
 
 
 def test_base_tools_are_registered_and_called():
-    model = TestModel()
+    model = TestModel(call_tools=["search_glossary", "get_lecture_summary"])
     with agent.override(model=model):
         result = agent.run_sync("LoRAとは？")
 
@@ -32,6 +33,15 @@ def test_base_tools_are_registered_and_called():
     waiting = len(result.output.approvals) if isinstance(result.output, DeferredToolRequests) else 0
     assert len(_parts(result, ToolReturnPart)) + waiting == len(_parts(result, ToolCallPart))
     assert result.output
+
+
+def test_learning_log_requires_approval():
+    model = TestModel(call_tools=["save_learning_log"])
+    with agent.override(model=model):
+        result = agent.run_sync("学習記録を保存して")
+
+    assert isinstance(result.output, DeferredToolRequests)
+    assert [call.tool_name for call in result.output.approvals] == ["save_learning_log"]
 
 
 def test_glossary_result_reaches_the_model():
