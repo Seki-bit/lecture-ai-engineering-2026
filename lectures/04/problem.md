@@ -66,10 +66,10 @@ git switch -c lec04 lec04-start
 ### STEP 1：10 件にラベルを付ける（約8分）
 
 ```bash
-uv run --with streamlit==1.66.1 streamlit run tools/annotate.py
+uv run streamlit run tools/annotate.py
 ```
 
-`uv run --with` は、講座の環境に Streamlit を一時的に足して実行する方法です（第3回の ADK と同じ）。`pyproject.toml` や `uv.lock` は変わりません。初回は Streamlit の取得に 1〜2 分かかるので、宿題の解説の間に起動しておきましょう。
+Streamlit は開発用依存関係に含まれています。初回は依存関係の同期に時間がかかることがあるので、宿題の解説の間に起動しておきましょう。
 
 1. 右下に出る「ブラウザーで開く」を押します（出ない場合は、下の「ポート」タブから 8501 を開きます）
 2. 左に質問・回答・参照（用語集のエントリと、期待するふるまい）、右に 5 つの基準のラジオボタンと「迷った」のチェックがあります
@@ -169,7 +169,7 @@ git push -u origin lec04
 
 ### 実装の進め方
 
-1. `uv run --with streamlit==1.66.1 streamlit run tools/annotate.py` を起動し、左の「作問（宿題・実装）」で、質問と「期待するふるまい」を 10 件作ります。正常系だけでなく、壊れそうな入力（エッジケース）を混ぜます。`data/eval/my_cases.jsonl` に保存されます
+1. `uv run streamlit run tools/annotate.py` を起動し、左の「作問（宿題・実装）」で、質問と「期待するふるまい」を 10 件作ります。正常系だけでなく、壊れそうな入力（エッジケース）を混ぜます。`data/eval/my_cases.jsonl` に保存されます
 2. `uv run python -m app.judge --generate --cases data/eval/my_cases.jsonl` で、第3回で作った自分のエージェント（`app/agent.py`）に回答を生成させます
 3. 「ラベル付け」の画面で、サイドバーの評価セットを `data/eval/my_cases.jsonl`、ラベルの保存先を `lectures/04/my_labels.jsonl` に変えてラベルを付けます
 4. `uv run python -m app.judge --cases data/eval/my_cases.jsonl --labels lectures/04/my_labels.jsonl --out lectures/04/my_judge_result.json` で採点します
