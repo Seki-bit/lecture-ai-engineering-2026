@@ -9,6 +9,13 @@
     "PYDANTIC_AI_NO_BANNER": "1",
     "UV_LINK_MODE": "copy"
   },
+  "forwardPorts": [8501],
+  "portsAttributes": {
+    "8501": {
+      "label": "Streamlit",
+      "onAutoForward": "openBrowser"
+    }
+  },
   // Codespaces 作成時に登録を促すシークレット
   "secrets": {
     "GEMINI_API_KEY": {
