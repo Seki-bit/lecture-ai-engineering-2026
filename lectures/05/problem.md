@@ -66,9 +66,9 @@ uv run python -m app.agent --full-context --trace "$AIE_QUESTION"
 
 ```bash
 uv run python -m app.retrieval "LoRA QLoRA 違い"
-```
-
-エージェントを使わず、質問に近いページを最大5件取得します。講義名・章・ページタイトル・PDFページ番号・本文が表示されます。
+``` 
+uv run python -m app.retrieval "コンパクションとセッションをまたぐメモリの違いは？
+日々のメモは全部長期メモリになる？"
 
 - 第2回・PDF p.52など、質問への答えを支えるページが含まれていますか
 - 単に似た用語が出ているページと、答えの根拠になるページを区別できますか
