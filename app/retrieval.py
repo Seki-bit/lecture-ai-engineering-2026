@@ -125,7 +125,7 @@ def open_index(path: Path):
 
 
 def search(query: str) -> list[dict]:
-    """質問を埋め込み、近いページを最大RAG_TOP_K件返す。"""
+    """質問を埋め込み、近いページと各資料内の前後1ページを返す。"""
     if not isinstance(query, str) or not query.strip():
         raise ValueError("検索語が空です。")
     with open_index(RAG_DB) as db:
@@ -135,7 +135,40 @@ def search(query: str) -> list[dict]:
                    vec_distance_cosine(embedding, ?) AS distance
             FROM chunks ORDER BY distance, page_id LIMIT ?
         """, (sqlite_vec.serialize_float32(vector), RAG_TOP_K))
-        return [dict(row) for row in rows]
+        hits = [dict(row) for row in rows]
+        indexed_page_ids = {
+            row["page_id"] for row in db.execute("SELECT page_id FROM chunks")
+        }
+
+    pages = load_pages(RAG_SOURCE)
+    document_pages = defaultdict(list)
+    for page in pages:
+        document_pages[page["document_id"]].append(page)
+
+    expanded = []
+    seen = set()
+    hit_by_id = {hit["page_id"]: hit for hit in hits}
+    for hit in hits:
+        siblings = document_pages.get(hit["document_id"], [])
+        for index, sibling in enumerate(siblings):
+            if sibling["page_id"] == hit["page_id"]:
+                break
+        else:
+            if hit["page_id"] not in seen:
+                expanded.append(hit)
+                seen.add(hit["page_id"])
+            continue
+
+        for sibling in siblings[max(0, index - 1):index + 2]:
+            page_id = sibling["page_id"]
+            if page_id not in indexed_page_ids or page_id in seen:
+                continue
+            seen.add(page_id)
+            if page_id in hit_by_id:
+                expanded.append(hit_by_id[page_id])
+            else:
+                expanded.append(sibling)
+    return expanded
 
 
 def search_graph(query: str) -> dict:

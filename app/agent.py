@@ -234,3 +234,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+AIE_QUESTION='第2回の説明では、LoRAは何を固定し何を学習しますか？ QLoRAは何を加えますか？'
