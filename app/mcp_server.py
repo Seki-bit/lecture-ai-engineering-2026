@@ -24,10 +24,29 @@ server = MCPServer(
     instructions="AIE2026（AIエンジニアリング実践講座）の用語集と各回の要点を提供する。",
 )
 
+
 # 第3回と同じ関数を、そのまま MCP のツールとして公開する。docstring と型ヒントが説明文になる
 server.tool()(tools.search_glossary)
 
 # TODO(宿題・基礎): get_lecture_summary も公開しよう
+server.tool()(tools.get_lecture_summary)
+
+
+@server.tool()
+def make_quiz(lecture: int) -> str:
+    """指定した回の学習内容を確認するために、用語の意味を問う問題を1問作る。
+
+    lecture は講義回の整数です。存在しない回が指定された場合は、
+    用意されている講義回を含むメッセージを返します。
+    """
+    available = sorted(
+        int(path.stem)
+        for path in (tools.DATA_DIR / "lectures").glob("*.md")
+    )
+    if lecture not in available:
+        available_text = ", ".join(str(item) for item in available)
+        return f"第{lecture}回の講義は存在しません。用意されている回: {available_text}"
+    return tools.make_quiz(lecture)
 
 
 def main() -> None:
